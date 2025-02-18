@@ -1,0 +1,33 @@
+- Tailwind
+
+{ 'champagne_pink': { DEFAULT: '#e8d6cb', 100: '#3c271a', 200: '#794f35', 300: '#b37751', 400: '#cda68e', 500: '#e8d6cb', 600: '#ecded4', 700: '#f1e6df', 800: '#f6eeea', 900: '#faf7f4' }, 'tea_rose_(red)': { DEFAULT: '#d0ada7', 100: '#311e1a', 200: '#623c35', 300: '#93594f', 400: '#b68178', 500: '#d0ada7', 600: '#dabfba', 700: '#e3cfcb', 800: '#ecdfdd', 900: '#f6efee' }, 'redwood': { DEFAULT: '#ad6a6c', 100: '#241414', 200: '#482829', 300: '#6d3c3d', 400: '#915052', 500: '#ad6a6c', 600: '#be898a', 700: '#cea6a8', 800: '#dec4c5', 900: '#efe1e2' }, 'violet_(jtc)': { DEFAULT: '#5d2e46', 100: '#12090e', 200: '#25121c', 300: '#371b2a', 400: '#4a2438', 500: '#5d2e46', 600: '#8e466b', 700: '#b56991', 800: '#ce9bb5', 900: '#e6cdda' }, 'african_violet': { DEFAULT: '#b58db6', 100: '#271927', 200: '#4e324e', 300: '#754b76', 400: '#9b659c', 500: '#b58db6', 600: '#c4a3c4', 700: '#d2bad3', 800: '#e1d1e2', 900: '#f0e8f0' } }
+
+- CSV
+
+e8d6cb,d0ada7,ad6a6c,5d2e46,b58db6
+
+- With #
+
+#e8d6cb, #d0ada7, #ad6a6c, #5d2e46, #b58db6
+
+- Array
+
+["e8d6cb","d0ada7","ad6a6c","5d2e46","b58db6"]
+
+- Object
+
+{"Champagne pink":"e8d6cb","Tea rose (red)":"d0ada7","Redwood":"ad6a6c","Violet (JTC)":"5d2e46","African Violet":"b58db6"}
+
+- Extended Array
+
+[{"name":"Champagne pink","hex":"e8d6cb","rgb":[232,214,203],"cmyk":[0,8,13,9],"hsb":[23,13,91],"hsl":[23,39,85],"lab":[87,4,8]},{"name":"Tea rose (red)","hex":"d0ada7","rgb":[208,173,167],"cmyk":[0,17,20,18],"hsb":[9,20,82],"hsl":[9,30,74],"lab":[74,12,8]},{"name":"Redwood","hex":"ad6a6c","rgb":[173,106,108],"cmyk":[0,39,38,32],"hsb":[358,39,68],"hsl":[358,29,55],"lab":[52,27,10]},{"name":"Violet (JTC)","hex":"5d2e46","rgb":[93,46,70],"cmyk":[0,51,25,64],"hsb":[329,51,36],"hsl":[329,34,27],"lab":[26,25,-5]},{"name":"African Violet","hex":"b58db6","rgb":[181,141,182],"cmyk":[1,23,0,29],"hsb":[299,23,71],"hsl":[299,22,63],"lab":[64,22,-16]}]
+
+- XML
+
+<palette>
+  <color name="Champagne pink" hex="e8d6cb" r="232" g="214" b="203" />
+  <color name="Tea rose (red)" hex="d0ada7" r="208" g="173" b="167" />
+  <color name="Redwood" hex="ad6a6c" r="173" g="106" b="108" />
+  <color name="Violet (JTC)" hex="5d2e46" r="93" g="46" b="70" />
+  <color name="African Violet" hex="b58db6" r="181" g="141" b="182" />
+</palette>

@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fragrantica Review Scraper</title>
+    <style>
+      * {
+        transition: all 0.3s ease;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #5d2e46 0%, #b58db6 100%);
+        opacity: 0;
+        animation: fadeInPage 1s ease forwards;
+      }
+
+      @keyframes fadeInPage {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .container {
+        width: 90%;
+        max-width: 800px;
+        margin: 2rem auto;
+        background-color: rgba(255, 255, 255, 0.95);
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(93, 46, 70, 0.2);
+        backdrop-filter: blur(10px);
+        transform: scale(0.98);
+        opacity: 0;
+        animation: containerAppear 0.6s ease 0.3s forwards;
+      }
+
+      @keyframes containerAppear {
+        from {
+          transform: scale(0.98);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .analysis-section {
+        transform: translateY(20px);
+        opacity: 0;
+        animation: sectionAppear 0.5s ease forwards;
+        animation-delay: calc(var(--index) * 0.1s);
+        margin-bottom: 15px;
+      }
+
+      @keyframes sectionAppear {
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .analysis-section:nth-child(1) {
+        --index: 1;
+      }
+      .analysis-section:nth-child(2) {
+        --index: 2;
+      }
+      .analysis-section:nth-child(3) {
+        --index: 3;
+      }
+      .analysis-section:nth-child(4) {
+        --index: 4;
+      }
+      .analysis-section:nth-child(5) {
+        --index: 5;
+      }
+      .analysis-section:nth-child(6) {
+        --index: 6;
+      }
+      .analysis-section:nth-child(7) {
+        --index: 7;
+      }
+
+      .section-header {
+        width: 100%;
+        padding: 12px 20px;
+        background-color: rgba(93, 46, 70, 0.1);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.1em;
+        color: #5d2e46;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .section-header:hover {
+        background-color: rgba(93, 46, 70, 0.2);
+      }
+
+      .section-header h3 {
+        margin: 0;
+        font-size: 1.1em;
+      }
+
+      .section-header .arrow {
+        transition: transform 0.3s ease;
+        color: #5d2e46;
+      }
+
+      .section-header .arrow.down {
+        transform: rotate(180deg);
+      }
+
+      .section-content {
+        display: block;
+        padding: 0 15px;
+        overflow: hidden;
+        max-height: none;
+        transition: all 0.3s ease;
+      }
+
+      .section-content.collapsed {
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        opacity: 0;
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 25px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 12px 20px;
+        border: 2px solid #e8d6cb;
+        border-radius: 12px;
+        font-size: 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 8px rgba(93, 46, 70, 0.1);
+        box-sizing: border-box;
+      }
+
+      input[type="text"]:focus {
+        outline: none;
+        border-color: #5d2e46;
+        box-shadow: 0 4px 12px rgba(93, 46, 70, 0.15);
+      }
+
+      button#scrapeButton {
+        width: 100%;
+        padding: 16px 20px;
+        background-color: #5d2e46;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 15px rgba(93, 46, 70, 0.2),
+          0 0 0 2px rgba(93, 46, 70, 0.2), 0 0 0 0 rgba(93, 46, 70, 0.2);
+      }
+
+      button#scrapeButton:hover {
+        transform: translateY(-2px);
+        background-color: #ad6a6c;
+        box-shadow: 0 6px 20px rgba(173, 106, 108, 0.3),
+          0 0 0 4px rgba(173, 106, 108, 0.2), 0 0 20px rgba(173, 106, 108, 0.2);
+      }
+
+      button#scrapeButton:active {
+        transform: translateY(1px);
+      }
+
+      button#scrapeButton:disabled {
+        background-color: #d0ada7;
+        transform: none;
+        box-shadow: none;
+        cursor: not-allowed;
+      }
+
+      .analysis h2 {
+        color: #5d2e46;
+        margin-bottom: 20px;
+        font-size: clamp(1.4em, 5vw, 1.8em);
+        font-weight: 600;
+        text-align: center;
+        padding: 0 10px;
+      }
+
+      .analysis h2 .brand-name {
+        display: block;
+        font-size: clamp(0.6em, 3.5vw, 0.8em);
+        color: #5d2e46;
+        margin-bottom: 8px;
+        line-height: 1.2;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        hyphens: auto;
+      }
+
+      .analysis h2 .fragrance-name {
+        display: block;
+        font-size: clamp(0.5em, 3vw, 0.7em);
+        color: #ad6a6c;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+        max-width: 100%;
+        line-height: 1.3;
+        padding: 0 15px;
+      }
+
+      .stats {
+        background-color: rgba(232, 214, 203, 0.3);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        display: none;
+        border: 1px solid rgba(208, 173, 167, 0.3);
+      }
+
+      .analysis {
+        background-color: rgba(255, 255, 255, 0.95);
+        padding: 25px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        display: none;
+        box-shadow: 0 4px 16px rgba(93, 46, 70, 0.08);
+      }
+
+      .analysis-section h3 {
+        color: #ad6a6c;
+        margin-bottom: 15px;
+        font-size: 1.2em;
+        font-weight: 600;
+      }
+
+      .similar-fragrance {
+        padding: 15px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(93, 46, 70, 0.2);
+        border-radius: 8px;
+        background-color: rgba(255, 255, 255, 0.5);
+        transition: all 0.3s ease;
+      }
+
+      .similar-fragrance:hover {
+        transform: translateX(4px);
+        box-shadow: 0 2px 8px rgba(93, 46, 70, 0.1);
+        border-color: rgba(93, 46, 70, 0.4);
+        background-color: rgba(255, 255, 255, 0.9);
+      }
+
+      .review:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(93, 46, 70, 0.12);
+      }
+
+      .review-number {
+        font-weight: 600;
+        color: #5d2e46;
+        margin-bottom: 8px;
+        font-size: 1.1em;
+      }
+
+      .error {
+        color: #ad6a6c;
+        padding: 15px;
+        background-color: rgba(173, 106, 108, 0.1);
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+        border: 1px solid rgba(173, 106, 108, 0.2);
+      }
+
+      .loading {
+        text-align: center;
+        display: none;
+        margin: 25px 0;
+        color: #5d2e46;
+        font-weight: 500;
+      }
+
+      .mention-context {
+        color: #ad6a6c;
+        margin-top: 8px;
+        font-style: italic;
+        line-height: 1.5;
+      }
+
+      .performance-detail {
+        margin-bottom: 15px;
+        padding: 15px;
+        background-color: rgba(232, 214, 203, 0.1);
+        border-radius: 8px;
+        border: 1px solid rgba(208, 173, 167, 0.2);
+      }
+
+      .analysis-text {
+        margin-top: 8px;
+        margin-left: 20px;
+        color: #666;
+        line-height: 1.6;
+      }
+
+      .toggle-reviews {
+        width: 100%;
+        padding: 15px 20px;
+        background-color: #5d2e46;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.1em;
+        color: white;
+        margin-bottom: 15px;
+      }
+
+      .toggle-reviews:hover {
+        background-color: #ad6a6c;
+      }
+
+      .toggle-reviews .arrow {
+        transition: transform 0.3s ease;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .toggle-reviews .arrow.down {
+        transform: rotate(90deg);
+      }
+
+      .reviews-container {
+        display: none;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .reviews-container.show {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .percentage-bar {
+        background-color: #e9ecef;
+        height: 8px;
+        border-radius: 4px;
+        margin-top: 5px;
+      }
+
+      .percentage-fill {
+        background-color: #4caf50;
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+
+      .rating {
+        display: inline-block;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.9em;
+      }
+
+      .rating-low {
+        background-color: #dc3545;
+      }
+
+      .rating-medium {
+        background-color: #ffc107;
+      }
+
+      .rating-high {
+        background-color: #28a745;
+      }
+
+      .reviews {
+        margin-top: 20px;
+      }
+
+      .review {
+        background-color: #fff;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-left: 4px solid #5d2e46;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .review-number {
+        font-weight: 600;
+        color: #5d2e46;
+        margin-bottom: 8px;
+        font-size: 1.1em;
+      }
+
+      .gender-detail {
+        margin-bottom: 10px;
+      }
+
+      .mention-detail {
+        margin-left: 20px;
+      }
+
+      .mention-quote {
+        font-style: italic;
+      }
+
+      .mention-analysis {
+        margin-top: 5px;
+      }
+
+      .reviews-section {
+        margin-top: 20px;
+        display: none;
+      }
+
+      .perfume-image {
+        max-width: 300px;
+        margin: 0 auto 20px auto;
+        display: block;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(93, 46, 70, 0.15);
+        transition: all 0.3s ease;
+      }
+
+      .perfume-image:hover {
+        transform: scale(1.02);
+        box-shadow: 0 6px 16px rgba(93, 46, 70, 0.2);
+      }
+
+      .section-controls {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        justify-content: flex-end;
+      }
+
+      .section-controls button {
+        padding: 8px 16px;
+        background-color: rgba(93, 46, 70, 0.1);
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        color: #5d2e46;
+        font-size: 0.9em;
+        transition: all 0.3s ease;
+      }
+
+      .section-controls button:hover {
+        background-color: rgba(93, 46, 70, 0.2);
+      }
+
+      .reviews-pagination {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin: 1rem 0;
+        align-items: center;
+      }
+
+      .reviews-pagination button {
+        padding: 0.5rem 1rem;
+        background-color: #5d2e46;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .reviews-pagination button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+
+      #reviewsPage {
+        font-weight: 600;
+        color: #5d2e46;
+      }
+
+      .analysis-timing {
+        margin-top: 15px;
+        padding: 8px 12px;
+        background-color: rgba(93, 46, 70, 0.05);
+        border-radius: 6px;
+        font-size: 0.9em;
+        color: #5d2e46;
+        display: inline-block;
+      }
+
+      /* Add specific styling for the mentioned fragrances section */
+      #similarFragrances {
+        max-height: none; /* Ensure no height restriction */
+        overflow: visible; /* Allow content to be fully visible */
+      }
+
+      #reviewsList {
+        max-height: none;
+        overflow: visible;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Fragrantica Review Scraper</h1>
+
+      <div class="input-group">
+        <input
+          type="text"
+          id="urlInput"
+          placeholder="Paste a Fragrantica perfume URL..."
+          autocomplete="off"
+          onkeydown="if (event.key === 'Enter') scrapeReviews()"
+        />
+        <button onclick="scrapeReviews()" id="scrapeButton">
+          Analyze Fragrance
+        </button>
+      </div>
+
+      <div id="error" class="error"></div>
+
+      <div id="loading" class="loading">Scraping reviews... Please wait...</div>
+
+      <div id="stats" class="stats">
+        <div>Download Time: <span id="downloadTime">0</span> seconds</div>
+        <div>Parse Time: <span id="parseTime">0</span> seconds</div>
+        <div>Analysis Time: <span id="analysisTime">0</span> seconds</div>
+        <div>Total Time: <span id="totalTime">0</span> seconds</div>
+        <div>Total Reviews: <span id="reviewCount">0</span></div>
+      </div>
+
+      <div id="analysis" class="analysis">
+        <h2>
+          Fragrance Analysis
+          <span class="brand-name"></span>
+          <span class="fragrance-name"></span>
+        </h2>
+
+        <img
+          id="perfumeImage"
+          class="perfume-image"
+          style="display: none"
+          alt="Perfume Image"
+        />
+
+        <div class="section-controls">
+          <button onclick="toggleAllSections(false)">Hide All</button>
+          <button onclick="toggleAllSections(true)">Show All</button>
+        </div>
+
+        <div class="analysis-section">
+          <button class="section-header" onclick="toggleSection(this)">
+            <h3>Seasonal Wear</h3>
+            <span class="arrow">▲</span>
+          </button>
+          <div class="section-content">
+            <div id="seasons"></div>
+          </div>
+        </div>
+
+        <div class="analysis-section">
+          <button class="section-header" onclick="toggleSection(this)">
+            <h3>Time of Day</h3>
+            <span class="arrow">▲</span>
+          </button>
+          <div class="section-content">
+            <div id="timeOfDay"></div>
+          </div>
+        </div>
+
+        <div class="analysis-section">
+          <button class="section-header" onclick="toggleSection(this)">
+            <h3>Occasions</h3>
+            <span class="arrow">▲</span>
+          </button>
+          <div class="section-content">
+            <div id="occasions"></div>
+          </div>
+        </div>
+
+        <div class="analysis-section">
+          <button class="section-header" onclick="toggleSection(this)">
+            <h3>Fragrances Mentioned in Reviews</h3>
+            <span class="arrow">▲</span>
+          </button>
+          <div class="section-content">
+            <div id="similarFragrances"></div>
+          </div>
+        </div>
+
+        <div class="analysis-section">
+          <button class="section-header" onclick="toggleSection(this)">
+            <h3>Performance</h3>
+            <span class="arrow">▲</span>
+          </button>
+          <div class="section-content">
+            <div id="performance"></div>
+          </div>
+        </div>
+
+        <div class="analysis-section">
+          <button class="section-header" onclick="toggleSection(this)">
+            <h3>Gender Classification</h3>
+            <span class="arrow">▲</span>
+          </button>
+          <div class="section-content">
+            <div id="gender"></div>
+          </div>
+        </div>
+
+        <div class="analysis-section">
+          <button class="section-header" onclick="toggleSection(this)">
+            <h3>Summary</h3>
+            <span class="arrow">▲</span>
+          </button>
+          <div class="section-content">
+            <div id="summary"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reviews-section">
+        <button class="section-header" onclick="toggleSection(this)">
+          <h3>Reviews</h3>
+          <span class="arrow">▲</span>
+        </button>
+        <div id="reviews" class="section-content">
+          <div id="reviewsList"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function toggleSection(button) {
+        const content = button.nextElementSibling;
+        const arrow = button.querySelector(".arrow");
+
+        content.classList.toggle("collapsed");
+        arrow.classList.toggle("down");
+      }
+
+      function toggleAllSections(show) {
+        const sections = document.querySelectorAll(".section-content");
+        const arrows = document.querySelectorAll(".section-header .arrow");
+
+        sections.forEach((section) => {
+          if (show) {
+            section.classList.remove("collapsed");
+          } else {
+            section.classList.add("collapsed");
+          }
+        });
+
+        arrows.forEach((arrow) => {
+          if (show) {
+            arrow.classList.remove("down");
+          } else {
+            arrow.classList.add("down");
+          }
+        });
+      }
+
+      function showReviews(reviews) {
+        const reviewsList = document.getElementById("reviewsList");
+        reviewsList.innerHTML = reviews
+          .map(
+            (review) => `
+          <div class="review">
+            <div class="review-number">Review #${review.number}</div>
+            <div>${review.text}</div>
+          </div>
+        `
+          )
+          .join("");
+      }
+
+      async function scrapeReviews() {
+        const urlInput = document.getElementById("urlInput");
+        const url = urlInput.value.trim();
+
+        if (!url) {
+          document.getElementById("error").textContent = "Please enter a URL";
+          document.getElementById("error").style.display = "block";
+          return;
+        }
+
+        const button = document.getElementById("scrapeButton");
+        const error = document.getElementById("error");
+        const loading = document.getElementById("loading");
+        const stats = document.getElementById("stats");
+        const reviewsList = document.getElementById("reviewsList");
+        const analysis = document.getElementById("analysis");
+        const reviewsSection = document.querySelector(".reviews-section");
+
+        // Reset and show loading state
+        error.style.display = "none";
+        stats.style.display = "none";
+        analysis.style.display = "none";
+        reviewsSection.style.display = "none";
+        reviewsList.innerHTML = "";
+        loading.style.display = "block";
+        button.disabled = true;
+
+        try {
+          const response = await fetch("/scrape", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ url: url }),
+          });
+
+          const data = await response.json();
+          console.log("Received response from server:", data);
+
+          if (data.error) {
+            console.error("Error from server:", data.error);
+            error.textContent = data.error;
+            error.style.display = "block";
+          } else {
+            console.log("Updating stats");
+            // Update stats
+            document.getElementById("downloadTime").textContent =
+              data.stats.download_time;
+            document.getElementById("parseTime").textContent =
+              data.stats.parse_time;
+            document.getElementById("analysisTime").textContent =
+              data.stats.analysis_time;
+            document.getElementById("totalTime").textContent =
+              data.stats.total_time;
+            document.getElementById("reviewCount").textContent =
+              data.stats.review_count;
+            stats.style.display = "block";
+
+            // Show all reviews
+            showReviews(data.reviews);
+
+            // Show the reviews section
+            reviewsSection.style.display = "block";
+            document.getElementById("reviews").classList.remove("collapsed");
+            const reviewsHeader =
+              reviewsSection.querySelector(".section-header");
+            const reviewsArrow = reviewsHeader.querySelector(".arrow");
+            reviewsArrow.classList.remove("down");
+            reviewsHeader.querySelector(
+              "h3"
+            ).textContent = `Reviews (${data.reviews.length})`;
+
+            // Display analysis progressively if available
+            if (data.analysis) {
+              console.log("Analysis data found, displaying analysis");
+              await displayAnalysis(data.analysis, data.fragrance_name, data);
+            } else {
+              console.warn("No analysis data in response");
+            }
+          }
+        } catch (err) {
+          console.error("Error during scrape:", err);
+          error.textContent = "An error occurred while scraping reviews.";
+          error.style.display = "block";
+        } finally {
+          loading.style.display = "none";
+          button.disabled = false;
+        }
+      }
+
+      async function displayAnalysis(analysis, fragrance_name, data) {
+        console.log("Displaying analysis:", analysis);
+        const analysisDiv = document.getElementById("analysis");
+        const reviewsSection = document.querySelector(".reviews-section");
+
+        if (analysis.error) {
+          console.error("Analysis error:", analysis.error);
+          return;
+        }
+
+        // Make the analysis div visible first
+        analysisDiv.style.display = "block";
+
+        // Update the heading to include the fragrance name
+        const nameParts = (fragrance_name || "Unknown Fragrance").split(
+          " for "
+        );
+        let brandName = nameParts[0];
+        let fragranceName = nameParts[1] || "";
+
+        if (brandName.includes(" by ")) {
+          const byParts = brandName.split(" by ");
+          fragranceName = byParts[0];
+          brandName = byParts[1];
+        }
+
+        const brandSpan = analysisDiv.querySelector("h2 .brand-name");
+        const fragranceSpan = analysisDiv.querySelector("h2 .fragrance-name");
+
+        brandSpan.textContent = brandName;
+        fragranceSpan.textContent = fragranceName;
+
+        // Display perfume image if available
+        const perfumeImage = document.getElementById("perfumeImage");
+        if (data && data.image_url) {
+          perfumeImage.src = data.image_url;
+          perfumeImage.style.display = "block";
+        } else {
+          perfumeImage.style.display = "none";
+        }
+
+        // Define the order of sections to display
+        const sections = [
+          {
+            id: "seasons",
+            data: analysis.seasons,
+            render: (data) => {
+              if (data.error) {
+                return `<div class="error-message">${data.error}</div>`;
+              }
+              const timing = data.analysis_time
+                ? `<div class="analysis-timing">Analysis Time: ${data.analysis_time}</div>`
+                : "";
+              return `
+                <strong>Primary:</strong> ${data.primary.join(", ")}<br>
+                <strong>Secondary:</strong> ${data.secondary.join(", ")}
+                ${timing}
+              `;
+            },
+          },
+          {
+            id: "timeOfDay",
+            data: analysis.time_of_day,
+            render: (data) => {
+              if (data.error) {
+                return `<div class="error-message">${data.error}</div>`;
+              }
+              const timing = data.analysis_time
+                ? `<div class="analysis-timing">Analysis Time: ${data.analysis_time}</div>`
+                : "";
+              return `
+                <strong>Best Times:</strong> ${data.best_times.join(", ")}<br>
+                <strong>Versatility:</strong> ${data.versatility}
+                ${timing}
+              `;
+            },
+          },
+          {
+            id: "occasions",
+            data: analysis.occasions,
+            render: (data) => {
+              if (data.error) {
+                return `<div class="error-message">${data.error}</div>`;
+              }
+              const timing = data.analysis_time
+                ? `<div class="analysis-timing">Analysis Time: ${data.analysis_time}</div>`
+                : "";
+              return `
+                ${
+                  data.occasions && data.occasions.length > 0
+                    ? data.occasions.join(", ")
+                    : "No specific occasions mentioned in reviews."
+                }
+                ${timing}
+              `;
+            },
+          },
+          {
+            id: "similarFragrances",
+            data: analysis.mentioned_fragrances,
+            render: (data) => {
+              if (data.error) {
+                return `<div class="error-message">${data.error}</div>`;
+              }
+              const timing = data.analysis_time
+                ? `<div class="analysis-timing">Analysis Time: ${data.analysis_time}</div>`
+                : "";
+              if (
+                data.mentioned_fragrances &&
+                data.mentioned_fragrances.length > 0
+              ) {
+                return `
+                  ${data.mentioned_fragrances
+                    .map(
+                      (frag) => `
+                    <div class="similar-fragrance">
+                      <strong>${frag.name}</strong>
+                      <p class="mention-context">${frag.context}</p>
+                    </div>
+                  `
+                    )
+                    .join("")}
+                  ${timing}
+                `;
+              }
+              return `<p>No other fragrances were mentioned in the reviews.</p>${timing}`;
+            },
+          },
+          {
+            id: "performance",
+            data: analysis.performance,
+            render: (data) => {
+              if (data.error) {
+                return `<div class="error-message">${data.error}</div>`;
+              }
+              const timing = data.analysis_time
+                ? `<div class="analysis-timing">Analysis Time: ${data.analysis_time}</div>`
+                : "";
+              return `
+                <div class="performance-detail">
+                  <strong>Longevity:</strong> ${data.longevity.conclusion}<br>
+                  <p class="analysis-text">${data.longevity.analysis}</p>
+                </div>
+                <div class="performance-detail">
+                  <strong>Sillage:</strong> ${data.sillage.conclusion}<br>
+                  <p class="analysis-text">${data.sillage.analysis}</p>
+                </div>
+                <div class="performance-detail">
+                  <strong>Projection:</strong> ${data.projection.conclusion}<br>
+                  <p class="analysis-text">${data.projection.analysis}</p>
+                </div>
+                ${timing}
+              `;
+            },
+          },
+          {
+            id: "gender",
+            data: analysis.gender_classification,
+            render: (data) => {
+              if (data.error) {
+                return `<div class="error-message">${data.error}</div>`;
+              }
+              const timing = data.analysis_time
+                ? `<div class="analysis-timing">Analysis Time: ${data.analysis_time}</div>`
+                : "";
+              return `
+                <div class="gender-detail">
+                  <strong>Classification:</strong> ${data.primary.conclusion}<br>
+                  <p class="analysis-text">${data.primary.analysis}</p>
+                </div>
+                <div class="gender-detail">
+                  <strong>Versatility:</strong> ${data.versatility.conclusion}<br>
+                  <p class="analysis-text">${data.versatility.analysis}</p>
+                </div>
+                ${timing}
+              `;
+            },
+          },
+          {
+            id: "summary",
+            data: analysis.summary,
+            render: (data) => {
+              if (typeof data === "string") {
+                return data;
+              }
+              if (data.error) {
+                return `<div class="error-message">${data.error}</div>`;
+              }
+              return data.summary || "No summary available.";
+            },
+          },
+        ];
+
+        // Display each section with a small delay
+        for (const section of sections) {
+          if (section.data) {
+            document.getElementById(section.id).innerHTML = section.render(
+              section.data
+            );
+            await new Promise((resolve) => setTimeout(resolve, 100)); // Small delay between sections
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

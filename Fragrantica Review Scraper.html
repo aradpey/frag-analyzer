@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fragrantica Review Scraper</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .input-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      input[type="text"] {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+      }
+      button {
+        padding: 10px 20px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+      }
+      .stats {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        display: none;
+      }
+      .analysis {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        display: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .analysis h2 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+      }
+      .analysis-section {
+        margin-bottom: 20px;
+      }
+      .analysis-section h3 {
+        color: #34495e;
+        margin-bottom: 10px;
+        font-size: 1.1em;
+      }
+      .similar-fragrance {
+        background-color: #f8f9fa;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+      }
+      .percentage-bar {
+        background-color: #e9ecef;
+        height: 8px;
+        border-radius: 4px;
+        margin-top: 5px;
+      }
+      .percentage-fill {
+        background-color: #4caf50;
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+      .rating {
+        display: inline-block;
+        background-color: #4caf50;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.9em;
+      }
+      .reviews {
+        margin-top: 20px;
+      }
+      .review {
+        background-color: #fff;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-left: 4px solid #4caf50;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .review-number {
+        font-weight: bold;
+        color: #4caf50;
+        margin-bottom: 5px;
+      }
+      .error {
+        color: #dc3545;
+        padding: 10px;
+        background-color: #f8d7da;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        display: none;
+      }
+      .loading {
+        text-align: center;
+        display: none;
+        margin: 20px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Fragrantica Review Scraper</h1>
+
+      <div class="input-group">
+        <input
+          type="text"
+          id="urlInput"
+          placeholder="Enter Fragrantica URL..."
+          onkeypress="if(event.key === 'Enter') { scrapeReviews(); return false; }"
+        />
+        <button onclick="scrapeReviews()" id="scrapeButton">
+          Scrape Reviews
+        </button>
+      </div>
+
+      <div id="error" class="error"></div>
+
+      <div id="loading" class="loading">Scraping reviews... Please wait...</div>
+
+      <div id="stats" class="stats">
+        <div>Download Time: <span id="downloadTime">0</span> seconds</div>
+        <div>Parse Time: <span id="parseTime">0</span> seconds</div>
+        <div>Analysis Time: <span id="analysisTime">0</span> seconds</div>
+        <div>Total Time: <span id="totalTime">0</span> seconds</div>
+        <div>Total Reviews: <span id="reviewCount">0</span></div>
+      </div>
+
+      <div id="analysis" class="analysis">
+        <h2>Fragrance Analysis</h2>
+
+        <div class="analysis-section">
+          <h3>Seasonal Wear</h3>
+          <div id="seasons"></div>
+        </div>
+
+        <div class="analysis-section">
+          <h3>Time of Day</h3>
+          <div id="timeOfDay"></div>
+        </div>
+
+        <div class="analysis-section">
+          <h3>Similar Fragrances</h3>
+          <div id="similarFragrances"></div>
+        </div>
+
+        <div class="analysis-section">
+          <h3>Performance</h3>
+          <div id="performance"></div>
+        </div>
+
+        <div class="analysis-section">
+          <h3>Gender Classification</h3>
+          <div id="gender"></div>
+        </div>
+
+        <div class="analysis-section">
+          <h3>Price Ranges</h3>
+          <div id="prices"></div>
+        </div>
+
+        <div class="analysis-section">
+          <h3>Summary</h3>
+          <div id="summary"></div>
+        </div>
+      </div>
+
+      <div id="reviews" class="reviews"></div>
+    </div>
+
+    <script>
+      function displayAnalysis(analysis) {
+        const analysisDiv = document.getElementById("analysis");
+
+        if (analysis.error) {
+          return;
+        }
+
+        // Seasons
+        const seasonsDiv = document.getElementById("seasons");
+        seasonsDiv.innerHTML = `
+          <strong>Primary:</strong> ${analysis.seasons.primary.join(", ")}<br>
+          <strong>Secondary:</strong> ${analysis.seasons.secondary.join(", ")}
+        `;
+
+        // Time of Day
+        const timeDiv = document.getElementById("timeOfDay");
+        timeDiv.innerHTML = `
+          <strong>Best Times:</strong> ${analysis.time_of_day.best_times.join(
+            ", "
+          )}<br>
+          <strong>Versatility:</strong> <span class="rating">${
+            analysis.time_of_day.versatility
+          }/10</span>
+        `;
+
+        // Similar Fragrances
+        const similarDiv = document.getElementById("similarFragrances");
+        similarDiv.innerHTML = analysis.similar_fragrances
+          .map(
+            (frag) => `
+          <div class="similar-fragrance">
+            <strong>${frag.name}</strong> (${
+              frag.similarity_percentage
+            }% similar)<br>
+            <div class="percentage-bar">
+              <div class="percentage-fill" style="width: ${
+                frag.similarity_percentage
+              }%"></div>
+            </div>
+            <small>Similar aspects: ${frag.similarity_aspects.join(
+              ", "
+            )}</small>
+          </div>
+        `
+          )
+          .join("");
+
+        // Performance
+        const perfDiv = document.getElementById("performance");
+        perfDiv.innerHTML = `
+          <strong>Longevity:</strong> ${analysis.performance.longevity}<br>
+          <strong>Sillage:</strong> <span class="rating">${analysis.performance.sillage}/10</span><br>
+          <strong>Projection:</strong> <span class="rating">${analysis.performance.projection}/10</span>
+        `;
+
+        // Gender
+        const genderDiv = document.getElementById("gender");
+        genderDiv.innerHTML = `
+          <strong>Classification:</strong> ${analysis.gender_classification.primary}<br>
+          <strong>Gender Versatility:</strong> <span class="rating">${analysis.gender_classification.versatility}/10</span>
+        `;
+
+        // Prices
+        const pricesDiv = document.getElementById("prices");
+        pricesDiv.innerHTML = `
+          <strong>30ml:</strong> ${analysis.price_ranges["30ml"]}<br>
+          <strong>50ml:</strong> ${analysis.price_ranges["50ml"]}<br>
+          <strong>100ml:</strong> ${analysis.price_ranges["100ml"]}
+        `;
+
+        // Summary
+        document.getElementById("summary").innerHTML = analysis.summary;
+
+        // Show the analysis section
+        analysisDiv.style.display = "block";
+      }
+
+      async function scrapeReviews() {
+        const urlInput = document.getElementById("urlInput");
+        const button = document.getElementById("scrapeButton");
+        const error = document.getElementById("error");
+        const loading = document.getElementById("loading");
+        const stats = document.getElementById("stats");
+        const reviews = document.getElementById("reviews");
+        const analysis = document.getElementById("analysis");
+
+        // Reset and show loading state
+        error.style.display = "none";
+        stats.style.display = "none";
+        analysis.style.display = "none";
+        reviews.innerHTML = "";
+        loading.style.display = "block";
+        button.disabled = true;
+
+        try {
+          const response = await fetch("/scrape", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ url: urlInput.value }),
+          });
+
+          const data = await response.json();
+
+          if (data.error) {
+            error.textContent = data.error;
+            error.style.display = "block";
+          } else {
+            // Update stats
+            document.getElementById("downloadTime").textContent =
+              data.stats.download_time;
+            document.getElementById("parseTime").textContent =
+              data.stats.parse_time;
+            document.getElementById("analysisTime").textContent =
+              data.stats.analysis_time;
+            document.getElementById("totalTime").textContent =
+              data.stats.total_time;
+            document.getElementById("reviewCount").textContent =
+              data.stats.review_count;
+            stats.style.display = "block";
+
+            // Display analysis if available
+            if (data.analysis) {
+              displayAnalysis(data.analysis);
+            }
+
+            // Display reviews
+            data.reviews.forEach((review) => {
+              const reviewElement = document.createElement("div");
+              reviewElement.className = "review";
+              reviewElement.innerHTML = `
+                <div class="review-number">Review #${review.number}</div>
+                <div>${review.text}</div>
+              `;
+              reviews.appendChild(reviewElement);
+            });
+          }
+        } catch (err) {
+          error.textContent = "An error occurred while scraping reviews.";
+          error.style.display = "block";
+        } finally {
+          loading.style.display = "none";
+          button.disabled = false;
+        }
+      }
+    </script>
+  </body>
+</html>
