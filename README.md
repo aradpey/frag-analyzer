@@ -2,6 +2,12 @@
 
 A sophisticated web application that scrapes and analyzes perfume reviews from Fragrantica.com using GPT-4, providing detailed insights into fragrances through multiple analysis modules.
 
+## Quick Links
+
+- [Repository](https://github.com/aradpey/frag-analyzer)
+- [Issues](https://github.com/aradpey/frag-analyzer/issues)
+- [Contact](mailto:ahouraradpey@gmail.com)
+
 ## Features
 
 ### 1. Review Scraping
@@ -92,8 +98,8 @@ Each module provides specialized analysis of different aspects:
 1. Clone the repository:
 
 ```bash
-git clone [repository-url]
-cd [repository-name]
+git clone https://github.com/aradpey/frag-analyzer.git
+cd frag-analyzer
 ```
 
 2. Create and activate a virtual environment:
@@ -218,4 +224,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Support
 
-For support, please open an issue in the GitHub repository or contact [your-email].
+For support, please open an issue in the [GitHub repository](https://github.com/aradpey/frag-analyzer/issues) or contact ahouraradpey@gmail.com.
