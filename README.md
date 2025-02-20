@@ -1,12 +1,10 @@
 # Fragrantica Review Analyzer
 
-A sophisticated web application that scrapes and analyzes perfume reviews from Fragrantica.com using GPT-4, providing detailed insights into fragrances through multiple analysis modules.
+A web application that scrapes and analyzes perfume reviews from Fragrantica.com using GPT-4, providing detailed insights into fragrances through multiple analysis modules.
 
-## Quick Links
 
-- [Repository](https://github.com/aradpey/frag-analyzer)
-- [Issues](https://github.com/aradpey/frag-analyzer/issues)
-- [Contact](mailto:ahouraradpey@gmail.com)
+https://github.com/user-attachments/assets/3f3c4a91-f4cd-4692-b4ae-0aec04ef6c17
+
 
 ## Features
 
