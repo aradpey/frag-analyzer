@@ -3,7 +3,11 @@
 A web application that scrapes and analyzes perfume reviews from Fragrantica.com using GPT-4, providing detailed insights into fragrances through multiple analysis modules.
 
 
-https://github.com/user-attachments/assets/3f3c4a91-f4cd-4692-b4ae-0aec04ef6c17
+
+
+https://github.com/user-attachments/assets/f5724df4-d125-4078-802e-b986d7268e64
+
+
 
 
 ## Features
